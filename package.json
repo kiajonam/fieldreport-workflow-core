@@ -1,0 +1,30 @@
+{
+  "name": "fieldreport-workflow-core",
+  "version": "0.1.0",
+  "description": "A lightweight, type-safe workflow state machine for TypeScript applications.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kiajonam/fieldreport-workflow-core.git"
+  },
+  "keywords": [
+    "workflow",
+    "state-machine",
+    "typescript",
+    "state-management"
+  ],
+  "author": "Sami",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}
