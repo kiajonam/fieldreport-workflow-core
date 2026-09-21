@@ -2,6 +2,7 @@ import {
   InvalidWorkflowTransitionError,
   canTransition,
   createWorkflowInstance,
+  createWorkflowTransitionEvent,
   getAvailableTransitions,
   transition,
   type WorkflowDefinition,
@@ -28,11 +29,9 @@ function assert(condition: boolean, message: string): void {
   }
 }
 
-const transitionEvent: WorkflowTransitionEvent<typeof reportWorkflow> = {
-  type: "workflow.transitioned",
-  from: "draft",
-  to: "submitted",
-};
+const transitionEvent = createWorkflowTransitionEvent<
+  typeof reportWorkflow
+>("draft", "submitted");
 
 assert(
   transitionEvent.type === "workflow.transitioned" &&
