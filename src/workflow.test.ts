@@ -1,5 +1,6 @@
 import {
   canTransition,
+  createWorkflowInstance,
   getAvailableTransitions,
   reportWorkflow,
   transition,
@@ -74,6 +75,58 @@ assert(
   "invalid transitions should throw an error",
 );
 
+const instance = createWorkflowInstance(reportWorkflow);
+
+assert(instance.state === "draft", "instance should start at the initial state");
+assert(
+  instance.getAvailableTransitions().length === 1 &&
+    instance.getAvailableTransitions()[0] === "submitted",
+  "instance should expose transitions for its current state",
+);
+assert(
+  instance.canTransition("submitted"),
+  "instance should allow a valid transition",
+);
+
+assert(
+  instance.transition("submitted") === "submitted",
+  "instance transition should return the new state",
+);
+assert(instance.state === "submitted", "instance state should be updated");
+
+assert(
+  instance.transition("under_review") === "under_review",
+  "instance should support sequential transitions",
+);
+assert(instance.state === "under_review", "instance should track the current state");
+assert(
+  instance.canTransition("approved"),
+  "instance should expose approved from under_review",
+);
+assert(
+  instance.canTransition("rejected"),
+  "instance should expose rejected from under_review",
+);
+
+let instanceInvalidTransitionRejected = false;
+
+try {
+  instance.transition("completed");
+} catch (error) {
+  instanceInvalidTransitionRejected =
+    error instanceof Error &&
+    error.message === "Invalid workflow transition: under_review -> completed";
+}
+
+assert(
+  instanceInvalidTransitionRejected,
+  "instance should reject invalid transitions",
+);
+assert(
+  instance.state === "under_review",
+  "failed transition should not change instance state",
+);
+
 function typeSafetyChecks(): void {
   // @ts-expect-error Invalid source state must be rejected by TypeScript.
   canTransition(reportWorkflow, "missing", "submitted");
@@ -89,6 +142,9 @@ function typeSafetyChecks(): void {
 
   // @ts-expect-error Invalid target state must be rejected by TypeScript.
   transition(reportWorkflow, "draft", "missing");
+
+  // @ts-expect-error Invalid target state must be rejected by the instance API.
+  createWorkflowInstance(reportWorkflow).transition("missing");
 }
 
 console.log("workflow tests passed");
