@@ -1,4 +1,9 @@
-import { canTransition, reportWorkflow, transition } from "./workflow.js";
+import {
+  canTransition,
+  getAvailableTransitions,
+  reportWorkflow,
+  transition,
+} from "./workflow.js";
 
 function assert(condition: boolean, message: string): void {
   if (!condition) {
@@ -32,6 +37,24 @@ assert(
 );
 
 assert(
+  getAvailableTransitions(reportWorkflow, "draft").length === 1 &&
+    getAvailableTransitions(reportWorkflow, "draft")[0] === "submitted",
+  "draft should have submitted as its only available transition",
+);
+
+assert(
+  getAvailableTransitions(reportWorkflow, "under_review").length === 2 &&
+    getAvailableTransitions(reportWorkflow, "under_review")[0] === "approved" &&
+    getAvailableTransitions(reportWorkflow, "under_review")[1] === "rejected",
+  "under_review should expose approved and rejected",
+);
+
+assert(
+  getAvailableTransitions(reportWorkflow, "completed").length === 0,
+  "completed should have no available transitions",
+);
+
+assert(
   transition(reportWorkflow, "draft", "submitted") === "submitted",
   "transition should return the target state",
 );
@@ -57,6 +80,9 @@ function typeSafetyChecks(): void {
 
   // @ts-expect-error Invalid target state must be rejected by TypeScript.
   canTransition(reportWorkflow, "draft", "missing");
+
+  // @ts-expect-error Invalid state must be rejected by TypeScript.
+  getAvailableTransitions(reportWorkflow, "missing");
 
   // @ts-expect-error Invalid source state must be rejected by TypeScript.
   transition(reportWorkflow, "missing", "submitted");
