@@ -1,4 +1,5 @@
 import {
+  InvalidWorkflowTransitionError,
   canTransition,
   createWorkflowInstance,
   getAvailableTransitions,
@@ -80,7 +81,7 @@ try {
   transition(reportWorkflow, "draft", "completed");
 } catch (error) {
   invalidTransitionRejected =
-    error instanceof Error &&
+    error instanceof InvalidWorkflowTransitionError &&
     error.message === "Invalid workflow transition: draft -> completed";
 }
 
@@ -143,7 +144,7 @@ try {
   instance.transition("completed");
 } catch (error) {
   instanceInvalidTransitionRejected =
-    error instanceof Error &&
+    error instanceof InvalidWorkflowTransitionError &&
     error.message === "Invalid workflow transition: under_review -> completed";
 }
 
