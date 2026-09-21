@@ -79,7 +79,7 @@ const instance = createWorkflowInstance(reportWorkflow);
 
 assert(instance.state === "draft", "instance should start at the initial state");
 assert(instance.history.length === 0, "new instance should have empty history");
-assert(!instance.isCompleted(), "draft should not be completed");
+assert(!instance.isTerminal(), "draft should not be completed");
 
 assert(
   instance.getAvailableTransitions().length === 1 &&
@@ -96,7 +96,7 @@ assert(
   "instance transition should return the new state",
 );
 assert(instance.state === "submitted", "instance state should be updated");
-assert(!instance.isCompleted(), "submitted should not be completed");
+assert(!instance.isTerminal(), "submitted should not be completed");
 
 assert(
   instance.history.length === 1 &&
@@ -110,7 +110,7 @@ assert(
   "instance should support sequential transitions",
 );
 assert(instance.state === "under_review", "instance should track the current state");
-assert(!instance.isCompleted(), "under_review should not be completed");
+assert(!instance.isTerminal(), "under_review should not be completed");
 
 assert(
   instance.history.length === 2 &&
@@ -146,7 +146,7 @@ instance.transition("approved");
 instance.transition("completed");
 
 assert(instance.state === "completed", "instance should reach completed");
-assert(instance.isCompleted(), "completed should be detected as terminal");
+assert(instance.isTerminal(), "completed should be detected as terminal");
 assert(
   instance.history.length === 4 &&
     instance.history[2].from === "under_review" &&
