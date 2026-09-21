@@ -37,3 +37,17 @@ export function canTransition<TWorkflow extends {
 
   return transitions[from]?.includes(to) ?? false;
 }
+
+export function transition<TWorkflow extends {
+  transitions: object;
+}>(
+  workflow: TWorkflow,
+  from: WorkflowState<TWorkflow>,
+  to: WorkflowState<TWorkflow>,
+): WorkflowState<TWorkflow> {
+  if (!canTransition(workflow, from, to)) {
+    throw new Error(`Invalid workflow transition: ${from} -> ${to}`);
+  }
+
+  return to;
+}
