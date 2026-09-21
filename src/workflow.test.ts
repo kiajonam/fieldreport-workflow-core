@@ -1,4 +1,4 @@
-import { canTransition, reportWorkflow } from "./workflow.js";
+import { canTransition, reportWorkflow, transition } from "./workflow.js";
 
 function assert(condition: boolean, message: string): void {
   if (!condition) {
@@ -31,10 +31,36 @@ assert(
   "completed should be terminal",
 );
 
+assert(
+  transition(reportWorkflow, "draft", "submitted") === "submitted",
+  "transition should return the target state",
+);
+
+let invalidTransitionRejected = false;
+
+try {
+  transition(reportWorkflow, "draft", "completed");
+} catch (error) {
+  invalidTransitionRejected =
+    error instanceof Error &&
+    error.message === "Invalid workflow transition: draft -> completed";
+}
+
+assert(
+  invalidTransitionRejected,
+  "invalid transitions should throw an error",
+);
+
 // @ts-expect-error Invalid source state must be rejected by TypeScript.
 canTransition(reportWorkflow, "missing", "submitted");
 
 // @ts-expect-error Invalid target state must be rejected by TypeScript.
 canTransition(reportWorkflow, "draft", "missing");
+
+// @ts-expect-error Invalid source state must be rejected by TypeScript.
+transition(reportWorkflow, "missing", "submitted");
+
+// @ts-expect-error Invalid target state must be rejected by TypeScript.
+transition(reportWorkflow, "draft", "missing");
 
 console.log("workflow tests passed");
