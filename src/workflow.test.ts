@@ -5,6 +5,7 @@ import {
   getAvailableTransitions,
   transition,
   type WorkflowDefinition,
+  type WorkflowTransitionEvent,
 } from "./workflow.js";
 
 const reportWorkflow: WorkflowDefinition<
@@ -26,6 +27,19 @@ function assert(condition: boolean, message: string): void {
     throw new Error(message);
   }
 }
+
+const transitionEvent: WorkflowTransitionEvent<typeof reportWorkflow> = {
+  type: "workflow.transitioned",
+  from: "draft",
+  to: "submitted",
+};
+
+assert(
+  transitionEvent.type === "workflow.transitioned" &&
+    transitionEvent.from === "draft" &&
+    transitionEvent.to === "submitted",
+  "workflow transition event should contain the transition contract",
+);
 
 assert(
   canTransition(reportWorkflow, "draft", "submitted"),
@@ -200,6 +214,15 @@ function typeSafetyChecks(): void {
 
   // @ts-expect-error Invalid target state must be rejected by the instance API.
   createWorkflowInstance(reportWorkflow).transition("missing");
+
+  const invalidEvent: WorkflowTransitionEvent<typeof reportWorkflow> = {
+    type: "workflow.transitioned",
+    // @ts-expect-error Invalid event source state must be rejected by TypeScript.
+    from: "missing",
+    to: "submitted",
+  };
+
+  void invalidEvent;
 }
 
 console.log("workflow tests passed");
