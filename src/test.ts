@@ -1,4 +1,18 @@
-import { canTransition, reportWorkflow } from "./workflow.js";
+import { canTransition, type WorkflowDefinition } from "./workflow.js";
+
+const reportWorkflow: WorkflowDefinition<
+  "draft" | "submitted" | "under_review" | "approved" | "rejected" | "completed"
+> = {
+  initialState: "draft",
+  transitions: {
+    draft: ["submitted"],
+    submitted: ["under_review"],
+    under_review: ["approved", "rejected"],
+    approved: ["completed"],
+    rejected: ["draft"],
+    completed: [],
+  },
+};
 
 console.log(
   canTransition(reportWorkflow, "draft", "submitted"),
