@@ -1,9 +1,9 @@
-import { canTransition,reportWorkflow } from "./workflow.js";
+import { canTransition, reportWorkflow } from "./workflow.js";
 
 console.log(
-    canTransition(reportWorkflow, "darft", "submitted"),
+  canTransition(reportWorkflow, "draft", "submitted"),
 );
 
 console.log(
-    canTransition(reportWorkflow, "draf", "completed")
+  canTransition(reportWorkflow, "draft", "completed"),
 );
