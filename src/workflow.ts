@@ -23,6 +23,20 @@ type WorkflowState<TWorkflow> = TWorkflow extends {
   ? Extract<keyof TTransitions, string>
   : never;
 
+export function getAvailableTransitions<TWorkflow extends {
+  transitions: object;
+}>(
+  workflow: TWorkflow,
+  state: WorkflowState<TWorkflow>,
+): readonly WorkflowState<TWorkflow>[] {
+  const transitions = workflow.transitions as Record<
+    string,
+    readonly string[] | undefined
+  >;
+
+  return (transitions[state] ?? []) as readonly WorkflowState<TWorkflow>[];
+}
+
 export function canTransition<TWorkflow extends {
   transitions: object;
 }>(
@@ -30,12 +44,7 @@ export function canTransition<TWorkflow extends {
   from: WorkflowState<TWorkflow>,
   to: WorkflowState<TWorkflow>,
 ): boolean {
-  const transitions = workflow.transitions as Record<
-    string,
-    readonly string[] | undefined
-  >;
-
-  return transitions[from]?.includes(to) ?? false;
+  return getAvailableTransitions(workflow, from).includes(to);
 }
 
 export function transition<TWorkflow extends {
