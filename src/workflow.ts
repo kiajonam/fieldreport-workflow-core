@@ -23,8 +23,14 @@ type WorkflowState<TWorkflow> = TWorkflow extends {
   ? Extract<keyof TTransitions, string>
   : never;
 
+export type WorkflowHistoryEntry<TWorkflow extends { transitions: object }> = {
+  readonly from: WorkflowState<TWorkflow>;
+  readonly to: WorkflowState<TWorkflow>;
+};
+
 export type WorkflowInstance<TWorkflow extends { transitions: object }> = {
   readonly state: WorkflowState<TWorkflow>;
+  readonly history: readonly WorkflowHistoryEntry<TWorkflow>[];
   getAvailableTransitions(): readonly WorkflowState<TWorkflow>[];
   canTransition(to: WorkflowState<TWorkflow>): boolean;
   transition(to: WorkflowState<TWorkflow>): WorkflowState<TWorkflow>;
@@ -76,10 +82,15 @@ export function createWorkflowInstance<TWorkflow extends {
   workflow: TWorkflow,
 ): WorkflowInstance<TWorkflow> {
   let state = workflow.initialState;
+  const history: WorkflowHistoryEntry<TWorkflow>[] = [];
 
   return {
     get state() {
       return state;
+    },
+
+    get history() {
+      return history.slice();
     },
 
     getAvailableTransitions() {
@@ -91,8 +102,12 @@ export function createWorkflowInstance<TWorkflow extends {
     },
 
     transition(to) {
-      const nextState = transition(workflow, state, to);
+      const from = state;
+      const nextState = transition(workflow, from, to);
+
+      history.push({ from, to: nextState });
       state = nextState;
+
       return state;
     },
 
