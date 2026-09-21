@@ -9,6 +9,7 @@ export type {
 export {
   InvalidWorkflowTransitionError,
   canTransition,
+  createWorkflowTransitionEvent,
   createWorkflowInstance,
   getAvailableTransitions,
   transition,
