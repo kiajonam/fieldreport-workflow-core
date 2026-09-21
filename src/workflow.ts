@@ -34,7 +34,7 @@ export type WorkflowInstance<TWorkflow extends { transitions: object }> = {
   getAvailableTransitions(): readonly WorkflowState<TWorkflow>[];
   canTransition(to: WorkflowState<TWorkflow>): boolean;
   transition(to: WorkflowState<TWorkflow>): WorkflowState<TWorkflow>;
-  isCompleted(): boolean;
+  isTerminal(): boolean;
 };
 
 export function getAvailableTransitions<TWorkflow extends {
@@ -111,7 +111,7 @@ export function createWorkflowInstance<TWorkflow extends {
       return state;
     },
 
-    isCompleted() {
+    isTerminal() {
       return getAvailableTransitions(workflow, state).length === 0;
     },
   };
