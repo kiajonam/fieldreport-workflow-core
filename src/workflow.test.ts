@@ -51,16 +51,18 @@ assert(
   "invalid transitions should throw an error",
 );
 
-// @ts-expect-error Invalid source state must be rejected by TypeScript.
-canTransition(reportWorkflow, "missing", "submitted");
+function typeSafetyChecks(): void {
+  // @ts-expect-error Invalid source state must be rejected by TypeScript.
+  canTransition(reportWorkflow, "missing", "submitted");
 
-// @ts-expect-error Invalid target state must be rejected by TypeScript.
-canTransition(reportWorkflow, "draft", "missing");
+  // @ts-expect-error Invalid target state must be rejected by TypeScript.
+  canTransition(reportWorkflow, "draft", "missing");
 
-// @ts-expect-error Invalid source state must be rejected by TypeScript.
-transition(reportWorkflow, "missing", "submitted");
+  // @ts-expect-error Invalid source state must be rejected by TypeScript.
+  transition(reportWorkflow, "missing", "submitted");
 
-// @ts-expect-error Invalid target state must be rejected by TypeScript.
-transition(reportWorkflow, "draft", "missing");
+  // @ts-expect-error Invalid target state must be rejected by TypeScript.
+  transition(reportWorkflow, "draft", "missing");
+}
 
 console.log("workflow tests passed");
