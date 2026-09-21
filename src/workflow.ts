@@ -3,6 +3,13 @@ export type WorkflowDefinition<TState extends string> = {
   transitions: Record<TState, readonly TState[]>;
 };
 
+export class InvalidWorkflowTransitionError extends Error {
+  constructor(from: string, to: string) {
+    super(`Invalid workflow transition: ${from} -> ${to}`);
+    this.name = "InvalidWorkflowTransitionError";
+  }
+}
+
 export type WorkflowState<TWorkflow> = TWorkflow extends {
   transitions: infer TTransitions;
 }
@@ -55,7 +62,7 @@ export function transition<TWorkflow extends {
   to: WorkflowState<TWorkflow>,
 ): WorkflowState<TWorkflow> {
   if (!canTransition(workflow, from, to)) {
-    throw new Error(`Invalid workflow transition: ${from} -> ${to}`);
+    throw new InvalidWorkflowTransitionError(from, to);
   }
 
   return to;
