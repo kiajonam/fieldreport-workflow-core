@@ -1,6 +1,8 @@
 export type {
   WorkflowDefinition,
+  WorkflowHistoryEntry,
   WorkflowInstance,
+  WorkflowState,
 } from "./workflow.js";
 
 export {
