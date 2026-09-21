@@ -3,20 +3,6 @@ export type WorkflowDefinition<TState extends string> = {
   transitions: Record<TState, readonly TState[]>;
 };
 
-export const reportWorkflow: WorkflowDefinition<
-  "draft" | "submitted" | "under_review" | "approved" | "rejected" | "completed"
-> = {
-  initialState: "draft",
-  transitions: {
-    draft: ["submitted"],
-    submitted: ["under_review"],
-    under_review: ["approved", "rejected"],
-    approved: ["completed"],
-    rejected: ["draft"],
-    completed: [],
-  },
-};
-
 type WorkflowState<TWorkflow> = TWorkflow extends {
   transitions: infer TTransitions;
 }
