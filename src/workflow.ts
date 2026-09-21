@@ -21,6 +21,14 @@ export type WorkflowHistoryEntry<TWorkflow extends { transitions: object }> = {
   readonly to: WorkflowState<TWorkflow>;
 };
 
+export type WorkflowTransitionEvent<
+  TWorkflow extends { transitions: object },
+> = {
+  readonly type: "workflow.transitioned";
+  readonly from: WorkflowState<TWorkflow>;
+  readonly to: WorkflowState<TWorkflow>;
+};
+
 export type WorkflowInstance<TWorkflow extends { transitions: object }> = {
   readonly state: WorkflowState<TWorkflow>;
   readonly history: readonly WorkflowHistoryEntry<TWorkflow>[];
