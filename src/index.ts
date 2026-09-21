@@ -6,6 +6,7 @@ export type {
 } from "./workflow.js";
 
 export {
+  InvalidWorkflowTransitionError,
   canTransition,
   createWorkflowInstance,
   getAvailableTransitions,
