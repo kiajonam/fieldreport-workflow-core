@@ -3,7 +3,7 @@ export type WorkflowDefinition<TState extends string> = {
   transitions: Record<TState, readonly TState[]>;
 };
 
-type WorkflowState<TWorkflow> = TWorkflow extends {
+export type WorkflowState<TWorkflow> = TWorkflow extends {
   transitions: infer TTransitions;
 }
   ? Extract<keyof TTransitions, string>
