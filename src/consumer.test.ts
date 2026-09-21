@@ -66,7 +66,9 @@ if (instance.history.length !== 1) {
   throw new Error("public workflow instance history should work");
 }
 
-// @ts-expect-error Invalid workflow state must remain rejected through the public API.
-instance.transition("missing");
+function typeSafetyChecks(): void {
+  // @ts-expect-error Invalid workflow state must remain rejected through the public API.
+  instance.transition("missing");
+}
 
 console.log("public API consumer test passed");
