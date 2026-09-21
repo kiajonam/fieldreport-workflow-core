@@ -78,6 +78,8 @@ assert(
 const instance = createWorkflowInstance(reportWorkflow);
 
 assert(instance.state === "draft", "instance should start at the initial state");
+assert(!instance.isCompleted(), "draft should not be completed");
+
 assert(
   instance.getAvailableTransitions().length === 1 &&
     instance.getAvailableTransitions()[0] === "submitted",
@@ -93,6 +95,7 @@ assert(
   "instance transition should return the new state",
 );
 assert(instance.state === "submitted", "instance state should be updated");
+assert(!instance.isCompleted(), "submitted should not be completed");
 
 assert(
   instance.transition("under_review") === "under_review",
@@ -107,6 +110,7 @@ assert(
   instance.canTransition("rejected"),
   "instance should expose rejected from under_review",
 );
+assert(!instance.isCompleted(), "under_review should not be completed");
 
 let instanceInvalidTransitionRejected = false;
 
@@ -126,6 +130,13 @@ assert(
   instance.state === "under_review",
   "failed transition should not change instance state",
 );
+
+instance.transition("approved");
+assert(instance.state === "approved", "instance should reach approved");
+
+instance.transition("completed");
+assert(instance.state === "completed", "instance should reach completed");
+assert(instance.isCompleted(), "completed should be detected as terminal");
 
 function typeSafetyChecks(): void {
   // @ts-expect-error Invalid source state must be rejected by TypeScript.
