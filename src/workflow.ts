@@ -42,6 +42,28 @@ export function createWorkflowTransitionEvent<
   };
 }
 
+export type WorkflowTransitionWithEventResult<
+  TWorkflow extends { transitions: object },
+> = {
+  readonly state: WorkflowState<TWorkflow>;
+  readonly event: WorkflowTransitionEvent<TWorkflow>;
+};
+
+export function transitionWithEvent<TWorkflow extends {
+  transitions: object;
+}>(
+  workflow: TWorkflow,
+  from: WorkflowState<TWorkflow>,
+  to: WorkflowState<TWorkflow>,
+): WorkflowTransitionWithEventResult<TWorkflow> {
+  const state = transition(workflow, from, to);
+
+  return {
+    state,
+    event: createWorkflowTransitionEvent(from, state),
+  };
+}
+
 export type WorkflowInstance<TWorkflow extends { transitions: object }> = {
   readonly state: WorkflowState<TWorkflow>;
   readonly history: readonly WorkflowHistoryEntry<TWorkflow>[];
