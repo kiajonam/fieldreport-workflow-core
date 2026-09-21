@@ -2,9 +2,23 @@ import {
   canTransition,
   createWorkflowInstance,
   getAvailableTransitions,
-  reportWorkflow,
   transition,
+  type WorkflowDefinition,
 } from "./workflow.js";
+
+const reportWorkflow: WorkflowDefinition<
+  "draft" | "submitted" | "under_review" | "approved" | "rejected" | "completed"
+> = {
+  initialState: "draft",
+  transitions: {
+    draft: ["submitted"],
+    submitted: ["under_review"],
+    under_review: ["approved", "rejected"],
+    approved: ["completed"],
+    rejected: ["draft"],
+    completed: [],
+  },
+};
 
 function assert(condition: boolean, message: string): void {
   if (!condition) {
