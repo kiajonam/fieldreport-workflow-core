@@ -5,6 +5,7 @@ import {
   createWorkflowTransitionEvent,
   getAvailableTransitions,
   transition,
+  transitionWithEvent,
   type WorkflowDefinition,
   type WorkflowTransitionEvent,
 } from "./workflow.js";
@@ -86,6 +87,35 @@ assert(
 assert(
   transition(reportWorkflow, "draft", "submitted") === "submitted",
   "transition should return the target state",
+);
+
+const transitionWithEventResult = transitionWithEvent(
+  reportWorkflow,
+  "draft",
+  "submitted",
+);
+
+assert(
+  transitionWithEventResult.state === "submitted" &&
+    transitionWithEventResult.event.type === "workflow.transitioned" &&
+    transitionWithEventResult.event.from === "draft" &&
+    transitionWithEventResult.event.to === "submitted",
+  "transitionWithEvent should return the new state and transition event",
+);
+
+let transitionWithEventInvalidRejected = false;
+
+try {
+  transitionWithEvent(reportWorkflow, "draft", "completed");
+} catch (error) {
+  transitionWithEventInvalidRejected =
+    error instanceof InvalidWorkflowTransitionError &&
+    error.message === "Invalid workflow transition: draft -> completed";
+}
+
+assert(
+  transitionWithEventInvalidRejected,
+  "transitionWithEvent should reject invalid transitions",
 );
 
 let invalidTransitionRejected = false;
@@ -213,6 +243,9 @@ function typeSafetyChecks(): void {
 
   // @ts-expect-error Invalid target state must be rejected by the instance API.
   createWorkflowInstance(reportWorkflow).transition("missing");
+
+  // @ts-expect-error Invalid target state must be rejected by TypeScript.
+  transitionWithEvent(reportWorkflow, "draft", "missing");
 
   const invalidEvent: WorkflowTransitionEvent<typeof reportWorkflow> = {
     type: "workflow.transitioned",
