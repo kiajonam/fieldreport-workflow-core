@@ -4,6 +4,7 @@ export type {
   WorkflowInstance,
   WorkflowState,
   WorkflowTransitionEvent,
+  WorkflowTransitionWithEventResult,
 } from "./workflow.js";
 
 export {
@@ -13,4 +14,5 @@ export {
   createWorkflowInstance,
   getAvailableTransitions,
   transition,
+  transitionWithEvent,
 } from "./workflow.js";
