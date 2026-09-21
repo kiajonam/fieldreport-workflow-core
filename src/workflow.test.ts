@@ -98,10 +98,12 @@ assert(
 assert(instance.state === "submitted", "instance state should be updated");
 assert(!instance.isTerminal(), "submitted should not be completed");
 
+const firstHistoryEntry = instance.history[0];
+
 assert(
-  instance.history.length === 1 &&
-    instance.history[0].from === "draft" &&
-    instance.history[0].to === "submitted",
+  firstHistoryEntry !== undefined &&
+    firstHistoryEntry.from === "draft" &&
+    firstHistoryEntry.to === "submitted",
   "history should record the submitted transition",
 );
 
@@ -112,10 +114,12 @@ assert(
 assert(instance.state === "under_review", "instance should track the current state");
 assert(!instance.isTerminal(), "under_review should not be completed");
 
+const secondHistoryEntry = instance.history[1];
+
 assert(
-  instance.history.length === 2 &&
-    instance.history[1].from === "submitted" &&
-    instance.history[1].to === "under_review",
+  secondHistoryEntry !== undefined &&
+    secondHistoryEntry.from === "submitted" &&
+    secondHistoryEntry.to === "under_review",
   "history should record sequential transitions",
 );
 
@@ -147,12 +151,16 @@ instance.transition("completed");
 
 assert(instance.state === "completed", "instance should reach completed");
 assert(instance.isTerminal(), "completed should be detected as terminal");
+const thirdHistoryEntry = instance.history[2];
+const fourthHistoryEntry = instance.history[3];
+
 assert(
-  instance.history.length === 4 &&
-    instance.history[2].from === "under_review" &&
-    instance.history[2].to === "approved" &&
-    instance.history[3].from === "approved" &&
-    instance.history[3].to === "completed",
+  thirdHistoryEntry !== undefined &&
+    fourthHistoryEntry !== undefined &&
+    thirdHistoryEntry.from === "under_review" &&
+    thirdHistoryEntry.to === "approved" &&
+    fourthHistoryEntry.from === "approved" &&
+    fourthHistoryEntry.to === "completed",
   "history should contain the complete successful transition sequence",
 );
 
