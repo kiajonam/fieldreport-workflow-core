@@ -5,25 +5,39 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc",
-    "test": "vitest run"
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node dist/workflow.test.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kiajonam/fieldreport-workflow-core.git"
+    "url": "git+https://github.com/kiajonam/fieldreport-workflow-core.git"
   },
   "keywords": [
     "workflow",
     "state-machine",
     "typescript",
-    "state-management"
+    "workflow-engine",
+    "state-machine-library"
   ],
   "author": "Sami",
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
     "typescript": "^7.0.2"
   }
