@@ -6,13 +6,6 @@ import type {
 } from "./workflow.js";
 import { createWorkflowInstance } from "./workflow.js";
 
-type RegisteredWorkflowDefinition = {
-  readonly id: string;
-  readonly version: number;
-  readonly initialState: string;
-  readonly transitions: Readonly<Record<string, readonly string[]>>;
-};
-
 export class InvalidWorkflowDefinitionError extends Error {
   constructor(message: string) {
     super(message);
