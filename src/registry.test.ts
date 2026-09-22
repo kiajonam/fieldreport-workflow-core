@@ -1,5 +1,6 @@
 import {
   DuplicateWorkflowRegistrationError,
+  InvalidWorkflowDefinitionError,
   WorkflowNotFoundError,
   WorkflowRegistry,
 } from "./registry.js";
