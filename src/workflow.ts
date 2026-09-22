@@ -12,6 +12,16 @@ export class InvalidWorkflowTransitionError extends Error {
   }
 }
 
+export class WorkflowTransitionHookError extends Error {
+  readonly cause: unknown;
+
+  constructor(cause: unknown) {
+    super("Workflow transition hook failed");
+    this.name = "WorkflowTransitionHookError";
+    this.cause = cause;
+  }
+}
+
 export type WorkflowState<TWorkflow> = TWorkflow extends {
   transitions: infer TTransitions;
 }
@@ -229,9 +239,13 @@ export function createWorkflowInstance<TWorkflow extends {
       history.push({ from, to: nextState });
       state = nextState;
 
-      options.onTransition?.(
-        createWorkflowTransitionEvent(workflow, from, nextState),
-      );
+      try {
+        options.onTransition?.(
+          createWorkflowTransitionEvent(workflow, from, nextState),
+        );
+      } catch (error) {
+        throw new WorkflowTransitionHookError(error);
+      }
 
       return state;
     },
