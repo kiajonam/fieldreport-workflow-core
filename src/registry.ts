@@ -1,6 +1,7 @@
 import type {
   WorkflowDefinition,
   WorkflowInstance,
+  WorkflowState,
 } from "./workflow.js";
 import { createWorkflowInstance } from "./workflow.js";
 
@@ -134,8 +135,16 @@ export class WorkflowRegistry<
     workflowId: string,
     version: number,
   ): WorkflowInstance<TWorkflow> {
+    const workflow = this.resolve(workflowId, version);
+
     return createWorkflowInstance(
-      this.resolve(workflowId, version),
+      workflow as TWorkflow & {
+        initialState: WorkflowState<TWorkflow>;
+        transitions: Record<
+          WorkflowState<TWorkflow>,
+          readonly WorkflowState<TWorkflow>[]
+        >;
+      },
     );
   }
 }
