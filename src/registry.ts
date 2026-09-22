@@ -1,4 +1,8 @@
-import type { WorkflowDefinition } from "./workflow.js";
+import type {
+  WorkflowDefinition,
+  WorkflowInstance,
+} from "./workflow.js";
+import { createWorkflowInstance } from "./workflow.js";
 
 type RegisteredWorkflowDefinition = {
   readonly id: string;
@@ -68,16 +72,18 @@ function validateWorkflowDefinition<TState extends string>(
   }
 }
 
-export class WorkflowRegistry {
+export class WorkflowRegistry<
+  TWorkflow extends RegisteredWorkflowDefinition = RegisteredWorkflowDefinition,
+> {
   private readonly workflows = new Map<
     string,
-    Map<number, RegisteredWorkflowDefinition>
+    Map<number, TWorkflow>
   >();
 
-  register<TState extends string>(
-    workflow: WorkflowDefinition<TState>,
-  ): void {
-    validateWorkflowDefinition(workflow);
+  register(workflow: TWorkflow): void {
+    validateWorkflowDefinition(
+      workflow as WorkflowDefinition<string>,
+    );
 
     let versions = this.workflows.get(workflow.id);
 
@@ -93,10 +99,7 @@ export class WorkflowRegistry {
       );
     }
 
-    versions.set(
-      workflow.version,
-      workflow as unknown as RegisteredWorkflowDefinition,
-    );
+    versions.set(workflow.version, workflow);
   }
 
   has(workflowId: string, version: number): boolean {
@@ -112,7 +115,7 @@ export class WorkflowRegistry {
   resolve(
     workflowId: string,
     version: number,
-  ): RegisteredWorkflowDefinition {
+  ): TWorkflow {
     const versions = this.workflows.get(workflowId);
     const workflow = versions?.get(version);
 
@@ -121,5 +124,14 @@ export class WorkflowRegistry {
     }
 
     return workflow;
+  }
+
+  createInstance(
+    workflowId: string,
+    version: number,
+  ): WorkflowInstance<TWorkflow> {
+    return createWorkflowInstance(
+      this.resolve(workflowId, version),
+    );
   }
 }
