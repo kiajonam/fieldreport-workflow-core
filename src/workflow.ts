@@ -27,59 +27,82 @@ export type WorkflowHistoryEntry<TWorkflow extends {
   readonly to: WorkflowState<TWorkflow>;
 };
 
-export type WorkflowTransitionEvent<TWorkflow extends {
-  id: string;
-  version: number;
-  transitions: object;
-}> = {
+export type WorkflowTransitionContext = Readonly<Record<string, unknown>>;
+
+export type WorkflowTransitionEvent<
+  TWorkflow extends {
+    id: string;
+    version: number;
+    transitions: object;
+  },
+  TContext extends WorkflowTransitionContext = WorkflowTransitionContext,
+> = {
   readonly type: "workflow.transitioned";
   readonly workflowId: TWorkflow["id"];
   readonly workflowVersion: TWorkflow["version"];
   readonly from: WorkflowState<TWorkflow>;
   readonly to: WorkflowState<TWorkflow>;
+  readonly context?: TContext;
 };
 
-export function createWorkflowTransitionEvent<TWorkflow extends {
-  id: string;
-  version: number;
-  transitions: object;
-}>(
+export function createWorkflowTransitionEvent<
+  TWorkflow extends {
+    id: string;
+    version: number;
+    transitions: object;
+  },
+  TContext extends WorkflowTransitionContext = WorkflowTransitionContext,
+>(
   workflow: TWorkflow,
   from: WorkflowState<TWorkflow>,
   to: WorkflowState<TWorkflow>,
-): WorkflowTransitionEvent<TWorkflow> {
+  context?: TContext,
+): WorkflowTransitionEvent<TWorkflow, TContext> {
   return {
     type: "workflow.transitioned",
     workflowId: workflow.id,
     workflowVersion: workflow.version,
     from,
     to,
+    ...(context === undefined ? {} : { context }),
   };
 }
 
-export type WorkflowTransitionWithEventResult<TWorkflow extends {
-  id: string;
-  version: number;
-  transitions: object;
-}> = {
+export type WorkflowTransitionWithEventResult<
+  TWorkflow extends {
+    id: string;
+    version: number;
+    transitions: object;
+  },
+  TContext extends WorkflowTransitionContext = WorkflowTransitionContext,
+> = {
   readonly state: WorkflowState<TWorkflow>;
-  readonly event: WorkflowTransitionEvent<TWorkflow>;
+  readonly event: WorkflowTransitionEvent<TWorkflow, TContext>;
 };
 
-export function transitionWithEvent<TWorkflow extends {
-  id: string;
-  version: number;
-  transitions: object;
-}>(
+export function transitionWithEvent<
+  TWorkflow extends {
+    id: string;
+    version: number;
+    transitions: object;
+  },
+  TContext extends WorkflowTransitionContext = WorkflowTransitionContext,
+>(
   workflow: TWorkflow,
   from: WorkflowState<TWorkflow>,
   to: WorkflowState<TWorkflow>,
-): WorkflowTransitionWithEventResult<TWorkflow> {
+  context?: TContext,
+): WorkflowTransitionWithEventResult<TWorkflow, TContext> {
   const state = transition(workflow, from, to);
 
   return {
     state,
-    event: createWorkflowTransitionEvent(workflow, from, state),
+    event: createWorkflowTransitionEvent(
+      workflow,
+      from,
+      state,
+      context,
+    ),
   };
 }
 
