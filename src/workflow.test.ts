@@ -13,6 +13,7 @@ import {
 const reportWorkflow: WorkflowDefinition<
   "draft" | "submitted" | "under_review" | "approved" | "rejected" | "completed"
 > = {
+  id: "report",
   version: 1,
   initialState: "draft",
   transitions: {
@@ -39,6 +40,7 @@ const transitionEvent = createWorkflowTransitionEvent(
 
 assert(
   transitionEvent.type === "workflow.transitioned" &&
+    transitionEvent.workflowId === "report" &&
     transitionEvent.workflowVersion === 1 &&
     transitionEvent.from === "draft" &&
     transitionEvent.to === "submitted",
@@ -141,8 +143,9 @@ const instance = createWorkflowInstance(reportWorkflow);
 
 assert(instance.state === "draft", "instance should start at the initial state");
 assert(
-  instance.workflowVersion === 1,
-  "instance should retain the workflow definition version",
+  instance.workflowId === "report" &&
+    instance.workflowVersion === 1,
+  "instance should retain the workflow definition identity",
 );
 assert(instance.history.length === 0, "new instance should have empty history");
 assert(!instance.isTerminal(), "draft should not be completed");
@@ -257,6 +260,7 @@ function typeSafetyChecks(): void {
 
   const invalidEvent: WorkflowTransitionEvent<typeof reportWorkflow> = {
     type: "workflow.transitioned",
+    workflowId: "report",
     workflowVersion: 1,
     // @ts-expect-error Invalid event source state must be rejected by TypeScript.
     from: "missing",
