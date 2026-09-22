@@ -80,6 +80,26 @@ export type WorkflowTransitionWithEventResult<
   readonly event: WorkflowTransitionEvent<TWorkflow, TContext>;
 };
 
+export type WorkflowTransitionHook<
+  TWorkflow extends {
+    id: string;
+    version: number;
+    transitions: object;
+  },
+> = (
+  event: WorkflowTransitionEvent<TWorkflow>,
+) => void;
+
+export type WorkflowInstanceOptions<
+  TWorkflow extends {
+    id: string;
+    version: number;
+    transitions: object;
+  },
+> = {
+  readonly onTransition?: WorkflowTransitionHook<TWorkflow>;
+};
+
 export function transitionWithEvent<
   TWorkflow extends {
     id: string;
@@ -172,6 +192,7 @@ export function createWorkflowInstance<TWorkflow extends {
   transitions: object;
 }>(
   workflow: TWorkflow,
+  options: WorkflowInstanceOptions<TWorkflow> = {},
 ): WorkflowInstance<TWorkflow> {
   let state = workflow.initialState;
   const history: WorkflowHistoryEntry<TWorkflow>[] = [];
@@ -207,6 +228,10 @@ export function createWorkflowInstance<TWorkflow extends {
 
       history.push({ from, to: nextState });
       state = nextState;
+
+      options.onTransition?.(
+        createWorkflowTransitionEvent(workflow, from, nextState),
+      );
 
       return state;
     },
