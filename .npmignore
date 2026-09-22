@@ -1,0 +1,2 @@
+# Keep test artifacts out of the published package.
+dist/**/*.test.*
