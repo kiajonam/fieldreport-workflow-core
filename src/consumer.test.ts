@@ -17,6 +17,7 @@ type ReportState =
   | "completed";
 
 const workflow: WorkflowDefinition<ReportState> = {
+  id: "report",
   version: 1,
   initialState: "draft",
   transitions: {
@@ -57,8 +58,12 @@ if (transition(workflow, "draft", "submitted") !== "submitted") {
 
 const instance = createWorkflowInstance(workflow);
 
-if (instance.state !== "draft" || instance.workflowVersion !== 1) {
-  throw new Error("public createWorkflowInstance API should expose the workflow version");
+if (
+  instance.state !== "draft" ||
+  instance.workflowId !== "report" ||
+  instance.workflowVersion !== 1
+) {
+  throw new Error("public createWorkflowInstance API should expose the workflow identity");
 }
 
 instance.transition("submitted");
