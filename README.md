@@ -44,7 +44,7 @@ npm test
 ```ts
 import { canTransition, type WorkflowDefinition } from "fieldreport-workflow-core";
 
-type ReportState =
+type OrderState =
   | "draft"
   | "submitted"
   | "under_review"
@@ -52,8 +52,8 @@ type ReportState =
   | "rejected"
   | "completed";
 
-const workflow: WorkflowDefinition<ReportState> = {
-  id: "report",
+const workflow: WorkflowDefinition<OrderState> = {
+  id: "order",
   version: 1,
   initialState: "draft",
   transitions: {
@@ -93,13 +93,13 @@ const registry = new WorkflowRegistry();
 
 registry.register(workflow);
 
-registry.has("report", 1);
+registry.has("order", 1);
 // true
 
-registry.getVersions("report");
+registry.getVersions("order");
 // [1]
 
-const resolved = registry.resolve("report", 1);
+const resolved = registry.resolve("order", 1);
 // returns the registered workflow definition
 
 registry.resolve("report", 99);
@@ -150,7 +150,7 @@ The package build writes JavaScript and declaration files to `dist/`.
 
 ## Scope
 
-The core deliberately does not contain persistence, HTTP, database, authentication, authorization, UI, or FieldReport business logic. Those concerns belong to the application using the workflow engine.
+The core deliberately does not contain persistence, HTTP, database, authentication, authorization, UI, or application-specific business logic. Those concerns belong to the application using the workflow engine.
 
 ## License
 
