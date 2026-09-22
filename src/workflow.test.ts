@@ -233,6 +233,29 @@ assert(
 const instance = createWorkflowInstance(reportWorkflow);
 
 assert(instance.state === "draft", "instance should start at the initial state");
+
+const auditedInstance = createWorkflowInstance(reportWorkflow, {
+  onTransition(event) {
+    assert(
+      event.context?.actorId === "user-789",
+      "transition hook should receive the transition context",
+    );
+  },
+});
+
+auditedInstance.transition("submitted", {
+  actorId: "user-789",
+  source: "mobile",
+});
+
+const auditedHistoryEntry = auditedInstance.history[0];
+
+assert(
+  auditedHistoryEntry !== undefined &&
+    auditedHistoryEntry.context?.actorId === "user-789" &&
+    auditedHistoryEntry.context?.source === "mobile",
+  "workflow history should retain transition context",
+);
 assert(
   instance.workflowId === "report" &&
     instance.workflowVersion === 1,
