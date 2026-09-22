@@ -20,6 +20,8 @@ This package provides a small core for defining allowed states and checking whet
 - Explicit transition maps
 - No runtime dependencies
 - Small API surface
+- Workflow identity and versioning
+- In-memory workflow registry and version resolution
 - Works with modern TypeScript and Node.js
 - Generates TypeScript declaration files for consumers
 
@@ -51,6 +53,8 @@ type ReportState =
   | "completed";
 
 const workflow: WorkflowDefinition<ReportState> = {
+  id: "report",
+  version: 1,
   initialState: "draft",
   transitions: {
     draft: ["submitted"],
@@ -75,6 +79,35 @@ Invalid states are rejected by TypeScript:
 canTransition(workflow, "draft", "unknown");
 // TypeScript error
 ```
+
+
+
+## Workflow registry
+
+The registry keeps workflow definitions addressable by their stable identity and version:
+
+```ts
+import { WorkflowRegistry } from "fieldreport-workflow-core";
+
+const registry = new WorkflowRegistry();
+
+registry.register(workflow);
+
+registry.has("report", 1);
+// true
+
+registry.getVersions("report");
+// [1]
+
+const resolved = registry.resolve("report", 1);
+// returns the registered workflow definition
+
+registry.resolve("report", 99);
+// throws WorkflowNotFoundError
+```
+
+Registering the same workflow identity and version twice throws
+`DuplicateWorkflowRegistrationError`.
 
 ## Development
 
