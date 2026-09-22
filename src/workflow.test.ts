@@ -38,6 +38,38 @@ const transitionEvent = createWorkflowTransitionEvent(
   "submitted",
 );
 
+const contextualTransitionEvent = createWorkflowTransitionEvent(
+  reportWorkflow,
+  "draft",
+  "submitted",
+  {
+    actorId: "user-123",
+    source: "api",
+  },
+);
+
+assert(
+  contextualTransitionEvent.context?.actorId === "user-123" &&
+    contextualTransitionEvent.context?.source === "api",
+  "workflow transition event should preserve transition context",
+);
+
+const contextualTransitionResult = transitionWithEvent(
+  reportWorkflow,
+  "draft",
+  "submitted",
+  {
+    actorId: "user-456",
+    source: "system",
+  },
+);
+
+assert(
+  contextualTransitionResult.event.context?.actorId === "user-456" &&
+    contextualTransitionResult.event.context?.source === "system",
+  "transitionWithEvent should preserve transition context",
+);
+
 assert(
   transitionEvent.type === "workflow.transitioned" &&
     transitionEvent.workflowId === "report" &&
