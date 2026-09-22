@@ -13,7 +13,18 @@
     }
   },
   "files": [
-    "dist",
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/index.js.map",
+    "dist/index.d.ts.map",
+    "dist/workflow.js",
+    "dist/workflow.d.ts",
+    "dist/workflow.js.map",
+    "dist/workflow.d.ts.map",
+    "dist/registry.js",
+    "dist/registry.d.ts",
+    "dist/registry.js.map",
+    "dist/registry.d.ts.map",
     "README.md",
     "LICENSE"
   ],
