@@ -36,11 +36,26 @@ const historyEntry: WorkflowHistoryEntry<typeof workflow> = {
   to: "submitted",
 };
 
+const publicContextHistoryEntry: WorkflowHistoryEntry<
+  typeof workflow,
+  { readonly actorId: string }
+> = {
+  from: "draft",
+  to: "submitted",
+  context: {
+    actorId: "user-123",
+  },
+};
+
 if (initialState !== workflow.initialState) {
   throw new Error("public WorkflowState type should match the workflow state");
 }
 
-if (historyEntry.from !== "draft" || historyEntry.to !== "submitted") {
+if (
+  historyEntry.from !== "draft" ||
+  historyEntry.to !== "submitted" ||
+  publicContextHistoryEntry.context?.actorId !== "user-123"
+) {
   throw new Error("public WorkflowHistoryEntry type should be usable");
 }
 
