@@ -128,6 +128,16 @@ If the hook throws, the transition is **not rolled back**. The error is wrapped 
 
 This keeps external side effects from controlling the workflow state machine.
 
+### Audit semantics
+
+A workflow instance history records each successful transition as `from`, `to`,
+and, when provided, the transition context. The same context is delivered to the
+transition hook and event.
+
+The workflow state and history are committed before the hook executes. A hook
+failure does not erase the committed audit entry or roll back the workflow state.
+
+
 ## Development
 
 ```bash
