@@ -55,7 +55,9 @@ function validateWorkflowDefinition<TState extends string>(
 
   const states = new Set(Object.keys(workflow.transitions));
 
-  for (const [state, targets] of Object.entries(workflow.transitions)) {
+  for (const state of states) {
+    const targets = workflow.transitions[state as TState];
+
     for (const target of targets) {
       if (!states.has(target)) {
         throw new InvalidWorkflowDefinitionError(
