@@ -1,4 +1,5 @@
 export type WorkflowDefinition<TState extends string> = {
+  readonly version: number;
   initialState: TState;
   transitions: Record<TState, readonly TState[]>;
 };
@@ -16,40 +17,50 @@ export type WorkflowState<TWorkflow> = TWorkflow extends {
   ? Extract<keyof TTransitions, string>
   : never;
 
-export type WorkflowHistoryEntry<TWorkflow extends { transitions: object }> = {
+export type WorkflowHistoryEntry<TWorkflow extends {
+  version: number;
+  transitions: object;
+}> = {
   readonly from: WorkflowState<TWorkflow>;
   readonly to: WorkflowState<TWorkflow>;
 };
 
-export type WorkflowTransitionEvent<
-  TWorkflow extends { transitions: object },
-> = {
+export type WorkflowTransitionEvent<TWorkflow extends {
+  version: number;
+  transitions: object;
+}> = {
   readonly type: "workflow.transitioned";
+  readonly workflowVersion: TWorkflow["version"];
   readonly from: WorkflowState<TWorkflow>;
   readonly to: WorkflowState<TWorkflow>;
 };
 
-export function createWorkflowTransitionEvent<
-  TWorkflow extends { transitions: object },
->(
+export function createWorkflowTransitionEvent<TWorkflow extends {
+  version: number;
+  transitions: object;
+}>(
+  workflow: TWorkflow,
   from: WorkflowState<TWorkflow>,
   to: WorkflowState<TWorkflow>,
 ): WorkflowTransitionEvent<TWorkflow> {
   return {
     type: "workflow.transitioned",
+    workflowVersion: workflow.version,
     from,
     to,
   };
 }
 
-export type WorkflowTransitionWithEventResult<
-  TWorkflow extends { transitions: object },
-> = {
+export type WorkflowTransitionWithEventResult<TWorkflow extends {
+  version: number;
+  transitions: object;
+}> = {
   readonly state: WorkflowState<TWorkflow>;
   readonly event: WorkflowTransitionEvent<TWorkflow>;
 };
 
 export function transitionWithEvent<TWorkflow extends {
+  version: number;
   transitions: object;
 }>(
   workflow: TWorkflow,
@@ -60,12 +71,16 @@ export function transitionWithEvent<TWorkflow extends {
 
   return {
     state,
-    event: createWorkflowTransitionEvent(from, state),
+    event: createWorkflowTransitionEvent(workflow, from, state),
   };
 }
 
-export type WorkflowInstance<TWorkflow extends { transitions: object }> = {
+export type WorkflowInstance<TWorkflow extends {
+  version: number;
+  transitions: object;
+}> = {
   readonly state: WorkflowState<TWorkflow>;
+  readonly workflowVersion: TWorkflow["version"];
   readonly history: readonly WorkflowHistoryEntry<TWorkflow>[];
   getAvailableTransitions(): readonly WorkflowState<TWorkflow>[];
   canTransition(to: WorkflowState<TWorkflow>): boolean;
@@ -74,6 +89,7 @@ export type WorkflowInstance<TWorkflow extends { transitions: object }> = {
 };
 
 export function getAvailableTransitions<TWorkflow extends {
+  version: number;
   transitions: object;
 }>(
   workflow: TWorkflow,
@@ -88,6 +104,7 @@ export function getAvailableTransitions<TWorkflow extends {
 }
 
 export function canTransition<TWorkflow extends {
+  version: number;
   transitions: object;
 }>(
   workflow: TWorkflow,
@@ -98,6 +115,7 @@ export function canTransition<TWorkflow extends {
 }
 
 export function transition<TWorkflow extends {
+  version: number;
   transitions: object;
 }>(
   workflow: TWorkflow,
@@ -112,6 +130,7 @@ export function transition<TWorkflow extends {
 }
 
 export function createWorkflowInstance<TWorkflow extends {
+  version: number;
   initialState: WorkflowState<TWorkflow>;
   transitions: object;
 }>(
@@ -123,6 +142,10 @@ export function createWorkflowInstance<TWorkflow extends {
   return {
     get state() {
       return state;
+    },
+
+    get workflowVersion() {
+      return workflow.version;
     },
 
     get history() {
