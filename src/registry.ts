@@ -10,7 +10,7 @@ type RegisteredWorkflowDefinition = {
   readonly id: string;
   readonly version: number;
   readonly initialState: string;
-  readonly transitions: Record<string, readonly string[]>;
+  readonly transitions: Readonly<Record<string, readonly string[]>>;
 };
 
 export class InvalidWorkflowDefinitionError extends Error {
