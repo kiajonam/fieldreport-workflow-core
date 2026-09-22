@@ -16,3 +16,9 @@ export {
   transition,
   transitionWithEvent,
 } from "./workflow.js";
+
+export {
+  DuplicateWorkflowRegistrationError,
+  WorkflowNotFoundError,
+  WorkflowRegistry,
+} from "./registry.js";
