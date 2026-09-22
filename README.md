@@ -109,6 +109,25 @@ registry.resolve("report", 99);
 Registering the same workflow identity and version twice throws
 `DuplicateWorkflowRegistrationError`.
 
+
+## Transition hooks
+
+Workflow instances can optionally receive an `onTransition` hook:
+
+```ts
+const instance = createWorkflowInstance(workflow, {
+  onTransition(event) {
+    // publish an event, record an audit entry, update metrics, etc.
+  },
+});
+```
+
+The transition is committed to the instance state and history before the hook runs.
+If the hook throws, the transition is **not rolled back**. The error is wrapped in
+`WorkflowTransitionHookError`, and the committed state remains available on the instance.
+
+This keeps external side effects from controlling the workflow state machine.
+
 ## Development
 
 ```bash
