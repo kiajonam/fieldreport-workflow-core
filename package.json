@@ -31,7 +31,8 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "npm run build && node dist/workflow.test.js && node dist/consumer.test.js && node dist/registry.test.js"
+    "test": "npm run build && node dist/workflow.test.js && node dist/consumer.test.js && node dist/registry.test.js",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
