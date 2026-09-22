@@ -28,13 +28,17 @@ export type WorkflowState<TWorkflow> = TWorkflow extends {
   ? Extract<keyof TTransitions, string>
   : never;
 
-export type WorkflowHistoryEntry<TWorkflow extends {
-  id: string;
-  version: number;
-  transitions: object;
-}> = {
+export type WorkflowHistoryEntry<
+  TWorkflow extends {
+    id: string;
+    version: number;
+    transitions: object;
+  },
+  TContext extends WorkflowTransitionContext = WorkflowTransitionContext,
+> = {
   readonly from: WorkflowState<TWorkflow>;
   readonly to: WorkflowState<TWorkflow>;
+  readonly context?: TContext;
 };
 
 export type WorkflowTransitionContext = Readonly<Record<string, unknown>>;
@@ -96,8 +100,9 @@ export type WorkflowTransitionHook<
     version: number;
     transitions: object;
   },
+  TContext extends WorkflowTransitionContext = WorkflowTransitionContext,
 > = (
-  event: WorkflowTransitionEvent<TWorkflow>,
+  event: WorkflowTransitionEvent<TWorkflow, TContext>,
 ) => void;
 
 export type WorkflowInstanceOptions<
@@ -106,8 +111,9 @@ export type WorkflowInstanceOptions<
     version: number;
     transitions: object;
   },
+  TContext extends WorkflowTransitionContext = WorkflowTransitionContext,
 > = {
-  readonly onTransition?: WorkflowTransitionHook<TWorkflow>;
+  readonly onTransition?: WorkflowTransitionHook<TWorkflow, TContext>;
 };
 
 export function transitionWithEvent<
@@ -136,18 +142,24 @@ export function transitionWithEvent<
   };
 }
 
-export type WorkflowInstance<TWorkflow extends {
-  id: string;
-  version: number;
-  transitions: object;
-}> = {
+export type WorkflowInstance<
+  TWorkflow extends {
+    id: string;
+    version: number;
+    transitions: object;
+  },
+  TContext extends WorkflowTransitionContext = WorkflowTransitionContext,
+> = {
   readonly state: WorkflowState<TWorkflow>;
   readonly workflowId: TWorkflow["id"];
   readonly workflowVersion: TWorkflow["version"];
-  readonly history: readonly WorkflowHistoryEntry<TWorkflow>[];
+  readonly history: readonly WorkflowHistoryEntry<TWorkflow, TContext>[];
   getAvailableTransitions(): readonly WorkflowState<TWorkflow>[];
   canTransition(to: WorkflowState<TWorkflow>): boolean;
-  transition(to: WorkflowState<TWorkflow>): WorkflowState<TWorkflow>;
+  transition(
+    to: WorkflowState<TWorkflow>,
+    context?: TContext,
+  ): WorkflowState<TWorkflow>;
   isTerminal(): boolean;
 };
 
@@ -195,17 +207,20 @@ export function transition<TWorkflow extends {
   return to;
 }
 
-export function createWorkflowInstance<TWorkflow extends {
-  id: string;
-  version: number;
-  initialState: WorkflowState<TWorkflow>;
-  transitions: object;
-}>(
+export function createWorkflowInstance<
+  TWorkflow extends {
+    id: string;
+    version: number;
+    initialState: WorkflowState<TWorkflow>;
+    transitions: object;
+  },
+  TContext extends WorkflowTransitionContext = WorkflowTransitionContext,
+>(
   workflow: TWorkflow,
-  options: WorkflowInstanceOptions<TWorkflow> = {},
-): WorkflowInstance<TWorkflow> {
+  options: WorkflowInstanceOptions<TWorkflow, TContext> = {},
+): WorkflowInstance<TWorkflow, TContext> {
   let state = workflow.initialState;
-  const history: WorkflowHistoryEntry<TWorkflow>[] = [];
+  const history: WorkflowHistoryEntry<TWorkflow, TContext>[] = [];
 
   return {
     get state() {
@@ -232,16 +247,25 @@ export function createWorkflowInstance<TWorkflow extends {
       return canTransition(workflow, state, to);
     },
 
-    transition(to) {
+    transition(to, context) {
       const from = state;
       const nextState = transition(workflow, from, to);
 
-      history.push({ from, to: nextState });
+      history.push({
+        from,
+        to: nextState,
+        ...(context === undefined ? {} : { context }),
+      });
       state = nextState;
 
       try {
         options.onTransition?.(
-          createWorkflowTransitionEvent(workflow, from, nextState),
+          createWorkflowTransitionEvent(
+            workflow,
+            from,
+            nextState,
+            context,
+          ),
         );
       } catch (error) {
         throw new WorkflowTransitionHookError(error);
