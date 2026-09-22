@@ -54,6 +54,16 @@ export class WorkflowRegistry {
     );
   }
 
+  has(workflowId: string, version: number): boolean {
+    return this.workflows.get(workflowId)?.has(version) ?? false;
+  }
+
+  getVersions(workflowId: string): readonly number[] {
+    return [...(this.workflows.get(workflowId)?.keys() ?? [])].sort(
+      (a, b) => a - b,
+    );
+  }
+
   resolve(
     workflowId: string,
     version: number,
