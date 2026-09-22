@@ -7,6 +7,13 @@ type RegisteredWorkflowDefinition = {
   readonly transitions: Record<string, readonly string[]>;
 };
 
+export class InvalidWorkflowDefinitionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidWorkflowDefinitionError";
+  }
+}
+
 export class DuplicateWorkflowRegistrationError extends Error {
   constructor(workflowId: string, version: number) {
     super(
@@ -25,6 +32,40 @@ export class WorkflowNotFoundError extends Error {
   }
 }
 
+function validateWorkflowDefinition<TState extends string>(
+  workflow: WorkflowDefinition<TState>,
+): void {
+  if (workflow.id.trim().length === 0) {
+    throw new InvalidWorkflowDefinitionError(
+      "Workflow id must not be empty",
+    );
+  }
+
+  if (!Number.isInteger(workflow.version) || workflow.version < 1) {
+    throw new InvalidWorkflowDefinitionError(
+      `Workflow version must be a positive integer: ${workflow.version}`,
+    );
+  }
+
+  if (!(workflow.initialState in workflow.transitions)) {
+    throw new InvalidWorkflowDefinitionError(
+      `Workflow initial state is not defined: ${workflow.initialState}`,
+    );
+  }
+
+  const states = new Set(Object.keys(workflow.transitions));
+
+  for (const [state, targets] of Object.entries(workflow.transitions)) {
+    for (const target of targets) {
+      if (!states.has(target)) {
+        throw new InvalidWorkflowDefinitionError(
+          `Workflow transition target is not defined: ${state} -> ${target}`,
+        );
+      }
+    }
+  }
+}
+
 export class WorkflowRegistry {
   private readonly workflows = new Map<
     string,
@@ -34,6 +75,8 @@ export class WorkflowRegistry {
   register<TState extends string>(
     workflow: WorkflowDefinition<TState>,
   ): void {
+    validateWorkflowDefinition(workflow);
+
     let versions = this.workflows.get(workflow.id);
 
     if (versions === undefined) {
