@@ -2,7 +2,7 @@ export type WorkflowDefinition<TState extends string> = {
   readonly id: string;
   readonly version: number;
   initialState: TState;
-  transitions: Record<TState, readonly TState[]>;
+  transitions: Readonly<Record<TState, readonly TState[]>>;
 };
 
 export class InvalidWorkflowTransitionError extends Error {
