@@ -28,6 +28,7 @@ export type WorkflowHistoryEntry<TWorkflow extends {
 };
 
 export type WorkflowTransitionEvent<TWorkflow extends {
+  id: string;
   version: number;
   transitions: object;
 }> = {
@@ -39,6 +40,7 @@ export type WorkflowTransitionEvent<TWorkflow extends {
 };
 
 export function createWorkflowTransitionEvent<TWorkflow extends {
+  id: string;
   version: number;
   transitions: object;
 }>(
@@ -56,6 +58,7 @@ export function createWorkflowTransitionEvent<TWorkflow extends {
 }
 
 export type WorkflowTransitionWithEventResult<TWorkflow extends {
+  id: string;
   version: number;
   transitions: object;
 }> = {
@@ -64,6 +67,7 @@ export type WorkflowTransitionWithEventResult<TWorkflow extends {
 };
 
 export function transitionWithEvent<TWorkflow extends {
+  id: string;
   version: number;
   transitions: object;
 }>(
@@ -80,6 +84,7 @@ export function transitionWithEvent<TWorkflow extends {
 }
 
 export type WorkflowInstance<TWorkflow extends {
+  id: string;
   version: number;
   transitions: object;
 }> = {
@@ -94,6 +99,7 @@ export type WorkflowInstance<TWorkflow extends {
 };
 
 export function getAvailableTransitions<TWorkflow extends {
+  id: string;
   version: number;
   transitions: object;
 }>(
@@ -109,6 +115,7 @@ export function getAvailableTransitions<TWorkflow extends {
 }
 
 export function canTransition<TWorkflow extends {
+  id: string;
   version: number;
   transitions: object;
 }>(
@@ -120,6 +127,7 @@ export function canTransition<TWorkflow extends {
 }
 
 export function transition<TWorkflow extends {
+  id: string;
   version: number;
   transitions: object;
 }>(
@@ -135,6 +143,7 @@ export function transition<TWorkflow extends {
 }
 
 export function createWorkflowInstance<TWorkflow extends {
+  id: string;
   version: number;
   initialState: WorkflowState<TWorkflow>;
   transitions: object;
