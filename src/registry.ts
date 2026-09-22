@@ -1,6 +1,7 @@
 import type {
   WorkflowDefinition,
   WorkflowInstance,
+  WorkflowInstanceOptions,
   WorkflowState,
 } from "./workflow.js";
 import { createWorkflowInstance } from "./workflow.js";
@@ -131,10 +132,14 @@ export class WorkflowRegistry<
     return workflow;
   }
 
-  createInstance(
+  createInstance<
+    TContext extends Readonly<Record<string, unknown>> =
+      Readonly<Record<string, unknown>>,
+  >(
     workflowId: string,
     version: number,
-  ): WorkflowInstance<TWorkflow> {
+    options: WorkflowInstanceOptions<TWorkflow, TContext> = {},
+  ): WorkflowInstance<TWorkflow, TContext> {
     const workflow = this.resolve(workflowId, version);
 
     return createWorkflowInstance(
@@ -145,6 +150,7 @@ export class WorkflowRegistry<
           readonly WorkflowState<TWorkflow>[]
         >;
       },
+      options,
     );
   }
 }
