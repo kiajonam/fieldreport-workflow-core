@@ -171,6 +171,33 @@ assert(
   "invalid transitions should throw an error",
 );
 
+let hookEvent:
+  | WorkflowTransitionEvent<typeof reportWorkflow>
+  | undefined;
+
+const hookedInstance = createWorkflowInstance(reportWorkflow, {
+  onTransition(event) {
+    hookEvent = event;
+  },
+});
+
+hookedInstance.transition("submitted");
+
+assert(
+  hookEvent !== undefined &&
+    hookEvent.type === "workflow.transitioned" &&
+    hookEvent.workflowId === "report" &&
+    hookEvent.workflowVersion === 1 &&
+    hookEvent.from === "draft" &&
+    hookEvent.to === "submitted",
+  "workflow transition hook should receive the successful transition event",
+);
+
+assert(
+  hookedInstance.state === "submitted",
+  "workflow transition hook should not prevent a successful transition",
+);
+
 const instance = createWorkflowInstance(reportWorkflow);
 
 assert(instance.state === "draft", "instance should start at the initial state");
