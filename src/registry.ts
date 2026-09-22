@@ -72,8 +72,12 @@ function validateWorkflowDefinition<TState extends string>(
   }
 }
 
+type WorkflowWithTypedStates<TState extends string> =
+  WorkflowDefinition<TState>;
+
 export class WorkflowRegistry<
-  TWorkflow extends RegisteredWorkflowDefinition = RegisteredWorkflowDefinition,
+  TWorkflow extends WorkflowWithTypedStates<string> =
+    WorkflowWithTypedStates<string>,
 > {
   private readonly workflows = new Map<
     string,
