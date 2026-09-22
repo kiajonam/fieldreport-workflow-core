@@ -57,6 +57,29 @@ registry.register(reportWorkflowV1);
 registry.register(reportWorkflowV2);
 registry.register(orderWorkflowV1);
 
+assert(
+  registry.has("report", 1) &&
+    registry.has("report", 2) &&
+    registry.has("order", 1),
+  "registry should report registered workflow versions",
+);
+
+assert(
+  !registry.has("report", 99) &&
+    !registry.has("missing", 1),
+  "registry should report missing workflow versions",
+);
+
+assert(
+  JSON.stringify(registry.getVersions("report")) === JSON.stringify([1, 2]),
+  "registry should return sorted versions for a workflow",
+);
+
+assert(
+  registry.getVersions("missing").length === 0,
+  "registry should return an empty version list for an unknown workflow",
+);
+
 const resolvedReportV1 = registry.resolve("report", 1);
 const resolvedReportV2 = registry.resolve("report", 2);
 const resolvedOrderV1 = registry.resolve("order", 1);
