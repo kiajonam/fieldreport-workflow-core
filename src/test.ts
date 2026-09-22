@@ -3,6 +3,7 @@ import { canTransition, type WorkflowDefinition } from "./workflow.js";
 const reportWorkflow: WorkflowDefinition<
   "draft" | "submitted" | "under_review" | "approved" | "rejected" | "completed" 
 > = {
+  id: "report",
   initialState: "draft",
   version: 1,
   transitions: {
