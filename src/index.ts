@@ -3,8 +3,10 @@ export type {
   WorkflowHistoryEntry,
   WorkflowInstance,
   WorkflowState,
+  WorkflowInstanceOptions,
   WorkflowTransitionContext,
   WorkflowTransitionEvent,
+  WorkflowTransitionHook,
   WorkflowTransitionWithEventResult,
 } from "./workflow.js";
 
