@@ -81,7 +81,13 @@ assert(
   "registry should return an empty version list for an unknown workflow",
 );
 
-const resolvedInstance = registry.createInstance("report", 1);
+let registryHookContext: Record<string, unknown> | undefined;
+
+const resolvedInstance = registry.createInstance("report", 1, {
+  onTransition(event) {
+    registryHookContext = event.context;
+  },
+});
 
 assert(
   resolvedInstance.state === "draft" &&
@@ -90,9 +96,15 @@ assert(
   "registry should create an instance from workflow identity and version",
 );
 
+resolvedInstance.transition("submitted", {
+  actorId: "registry-user",
+  source: "api",
+});
+
 assert(
-  resolvedInstance.canTransition("submitted"),
-  "resolved workflow instance should preserve transition behavior",
+  registryHookContext?.actorId === "registry-user" &&
+    resolvedInstance.history[0]?.context?.source === "api",
+  "registry-created instances should preserve context through hooks and history",
 );
 
 const resolvedReportV1 = registry.resolve("report", 1);
