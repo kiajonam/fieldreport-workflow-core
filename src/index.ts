@@ -12,6 +12,7 @@ export type {
 
 export {
   InvalidWorkflowTransitionError,
+  WorkflowTransitionHookError,
   canTransition,
   createWorkflowTransitionEvent,
   createWorkflowInstance,
