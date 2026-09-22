@@ -22,14 +22,24 @@ This package provides a small core for defining allowed states and checking whet
 - Small API surface
 - Workflow identity and versioning
 - In-memory workflow registry and version resolution
+- Stateful workflow instances
+- Transition history and contextual audit semantics
+- Transition events and hooks
+- Typed workflow errors
 - Works with modern TypeScript and Node.js
 - Generates TypeScript declaration files for consumers
 
 ## Installation
 
-This project is currently under development and is not published to npm yet.
+The package is prepared for npm publication. The first npm release has not been published yet.
 
-For local development:
+After publication:
+
+```bash
+npm install fieldreport-workflow-core
+```
+
+For local development directly from the repository:
 
 ```bash
 git clone https://github.com/kiajonam/fieldreport-workflow-core.git
@@ -80,8 +90,6 @@ canTransition(workflow, "draft", "unknown");
 // TypeScript error
 ```
 
-
-
 ## Workflow registry
 
 The registry keeps workflow definitions addressable by their stable identity and version:
@@ -109,12 +117,16 @@ registry.resolve("order", 99);
 Registering the same workflow identity and version twice throws
 `DuplicateWorkflowRegistrationError`.
 
-
 ## Transition hooks
 
 Workflow instances can optionally receive an `onTransition` hook:
 
 ```ts
+import {
+  createWorkflowInstance,
+  type WorkflowDefinition,
+} from "fieldreport-workflow-core";
+
 const instance = createWorkflowInstance(workflow, {
   onTransition(event) {
     // publish an event, record an audit entry, update metrics, etc.
@@ -136,7 +148,6 @@ transition hook and event.
 
 The workflow state and history are committed before the hook executes. A hook
 failure does not erase the committed audit entry or roll back the workflow state.
-
 
 ## Development
 
