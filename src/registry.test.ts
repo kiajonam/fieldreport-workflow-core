@@ -81,6 +81,20 @@ assert(
   "registry should return an empty version list for an unknown workflow",
 );
 
+const resolvedInstance = registry.createInstance("report", 1);
+
+assert(
+  resolvedInstance.state === "draft" &&
+    resolvedInstance.workflowId === "report" &&
+    resolvedInstance.workflowVersion === 1,
+  "registry should create an instance from workflow identity and version",
+);
+
+assert(
+  resolvedInstance.canTransition("submitted"),
+  "resolved workflow instance should preserve transition behavior",
+);
+
 const resolvedReportV1 = registry.resolve("report", 1);
 const resolvedReportV2 = registry.resolve("report", 2);
 const resolvedOrderV1 = registry.resolve("order", 1);
