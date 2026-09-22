@@ -102,7 +102,7 @@ registry.getVersions("order");
 const resolved = registry.resolve("order", 1);
 // returns the registered workflow definition
 
-registry.resolve("report", 99);
+registry.resolve("order", 99);
 // throws WorkflowNotFoundError
 ```
 
