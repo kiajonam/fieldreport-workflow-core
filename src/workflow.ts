@@ -1,4 +1,5 @@
 export type WorkflowDefinition<TState extends string> = {
+  readonly id: string;
   readonly version: number;
   initialState: TState;
   transitions: Record<TState, readonly TState[]>;
@@ -18,6 +19,7 @@ export type WorkflowState<TWorkflow> = TWorkflow extends {
   : never;
 
 export type WorkflowHistoryEntry<TWorkflow extends {
+  id: string;
   version: number;
   transitions: object;
 }> = {
@@ -30,6 +32,7 @@ export type WorkflowTransitionEvent<TWorkflow extends {
   transitions: object;
 }> = {
   readonly type: "workflow.transitioned";
+  readonly workflowId: TWorkflow["id"];
   readonly workflowVersion: TWorkflow["version"];
   readonly from: WorkflowState<TWorkflow>;
   readonly to: WorkflowState<TWorkflow>;
@@ -45,6 +48,7 @@ export function createWorkflowTransitionEvent<TWorkflow extends {
 ): WorkflowTransitionEvent<TWorkflow> {
   return {
     type: "workflow.transitioned",
+    workflowId: workflow.id,
     workflowVersion: workflow.version,
     from,
     to,
@@ -80,6 +84,7 @@ export type WorkflowInstance<TWorkflow extends {
   transitions: object;
 }> = {
   readonly state: WorkflowState<TWorkflow>;
+  readonly workflowId: TWorkflow["id"];
   readonly workflowVersion: TWorkflow["version"];
   readonly history: readonly WorkflowHistoryEntry<TWorkflow>[];
   getAvailableTransitions(): readonly WorkflowState<TWorkflow>[];
@@ -142,6 +147,10 @@ export function createWorkflowInstance<TWorkflow extends {
   return {
     get state() {
       return state;
+    },
+
+    get workflowId() {
+      return workflow.id;
     },
 
     get workflowVersion() {
