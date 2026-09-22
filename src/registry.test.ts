@@ -2,8 +2,8 @@ import {
   DuplicateWorkflowRegistrationError,
   WorkflowNotFoundError,
   WorkflowRegistry,
-  type WorkflowDefinition,
 } from "./registry.js";
+import type { WorkflowDefinition } from "./workflow.js";
 
 type ReportState =
   | "draft"
