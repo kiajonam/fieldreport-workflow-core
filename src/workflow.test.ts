@@ -1,5 +1,6 @@
 import {
   InvalidWorkflowTransitionError,
+  WorkflowTransitionHookError,
   canTransition,
   createWorkflowInstance,
   createWorkflowTransitionEvent,
@@ -196,6 +197,37 @@ assert(
 assert(
   hookedInstance.state === "submitted",
   "workflow transition hook should not prevent a successful transition",
+);
+
+const failingHookInstance = createWorkflowInstance(reportWorkflow, {
+  onTransition() {
+    throw new Error("audit sink unavailable");
+  },
+});
+
+let hookFailureRejected = false;
+
+try {
+  failingHookInstance.transition("submitted");
+} catch (error) {
+  hookFailureRejected =
+    error instanceof WorkflowTransitionHookError &&
+    error.message === "Workflow transition hook failed" &&
+    error.cause instanceof Error &&
+    error.cause.message === "audit sink unavailable";
+}
+
+assert(
+  hookFailureRejected,
+  "hook failures should be reported as WorkflowTransitionHookError",
+);
+
+assert(
+  failingHookInstance.state === "submitted" &&
+    failingHookInstance.history.length === 1 &&
+    failingHookInstance.history[0]?.from === "draft" &&
+    failingHookInstance.history[0]?.to === "submitted",
+  "hook failure should not roll back a committed workflow transition",
 );
 
 const instance = createWorkflowInstance(reportWorkflow);
