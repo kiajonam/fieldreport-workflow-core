@@ -153,6 +153,35 @@ registry.resolve("order", 99);
 Registering the same workflow identity and version twice throws
 `DuplicateWorkflowRegistrationError`.
 
+## Workflow registry and version resolution
+
+The registry can keep multiple versions of the same workflow identity available at the same time. Consumers resolve the exact version they need instead of relying on an implicit "latest" workflow.
+
+```ts
+import { WorkflowRegistry } from "fieldreport-workflow-core";
+
+const registry = new WorkflowRegistry();
+
+registry.register(orderWorkflowV1);
+registry.register(orderWorkflowV2);
+
+registry.getVersions("order");
+// [1, 2]
+
+const v1 = registry.resolve("order", 1);
+const v2 = registry.resolve("order", 2);
+
+const instance = registry.createInstance("order", 2);
+```
+
+Registering the same workflow identity and version twice throws
+`DuplicateWorkflowRegistrationError`. Resolving an unknown identity or version throws
+`WorkflowNotFoundError`.
+
+A runnable JavaScript consumer example is available at:
+
+`examples/consumer-registry/index.js`
+
 ## Transition events
 
 A transition event contains the stable workflow identity, version, source state, target state, and optional context.
