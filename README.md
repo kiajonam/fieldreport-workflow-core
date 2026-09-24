@@ -31,9 +31,7 @@ This package provides a small core for defining allowed states and checking whet
 
 ## Installation
 
-The package is prepared for npm publication. The first npm release has not been published yet.
-
-After publication:
+The package is publicly available on npm as version `0.1.0`:
 
 ```bash
 npm install fieldreport-workflow-core
@@ -89,6 +87,44 @@ Invalid states are rejected by TypeScript:
 canTransition(workflow, "draft", "unknown");
 // TypeScript error
 ```
+
+## Stateful instances and contextual history
+
+A workflow instance keeps its current state and records every successful transition. Optional transition context is preserved in the history and can carry application-defined audit information.
+
+```ts
+import { createWorkflowInstance } from "fieldreport-workflow-core";
+
+const instance = createWorkflowInstance(workflow);
+
+instance.transition("submitted", {
+  userId: "user-123",
+  reason: "Order submitted",
+  source: "web-app",
+});
+
+console.log(instance.state);
+// "submitted"
+
+console.log(instance.history);
+// [
+//   {
+//     from: "draft",
+//     to: "submitted",
+//     context: {
+//       userId: "user-123",
+//       reason: "Order submitted",
+//       source: "web-app"
+//     }
+//   }
+// ]
+```
+
+The context shape is application-defined. The core does not interpret or persist these fields.
+
+A runnable JavaScript consumer example is available at:
+
+`examples/consumer-context/index.js`
 
 ## Workflow registry
 
