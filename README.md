@@ -153,6 +153,46 @@ registry.resolve("order", 99);
 Registering the same workflow identity and version twice throws
 `DuplicateWorkflowRegistrationError`.
 
+## Transition events
+
+A transition event contains the stable workflow identity, version, source state, target state, and optional context.
+
+```ts
+import { transitionWithEvent } from "fieldreport-workflow-core";
+
+const result = transitionWithEvent(
+  workflow,
+  "draft",
+  "submitted",
+  {
+    userId: "user-123",
+    source: "web-app",
+  },
+);
+
+console.log(result.state);
+// "submitted"
+
+console.log(result.event);
+// {
+//   type: "workflow.transitioned",
+//   workflowId: "order",
+//   workflowVersion: 1,
+//   from: "draft",
+//   to: "submitted",
+//   context: {
+//     userId: "user-123",
+//     source: "web-app"
+//   }
+// }
+```
+
+For stateful workflows, the same event contract is delivered to the optional transition hook after the state and history have been committed.
+
+A runnable JavaScript consumer example is available at:
+
+`examples/consumer-events/index.js`
+
 ## Transition hooks
 
 Workflow instances can optionally receive an `onTransition` hook:
